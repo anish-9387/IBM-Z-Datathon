@@ -1,5 +1,5 @@
-"""Stores ONLY numbers that were actually computed by a cell in this environment, with a
-timestamp and the machine they were measured on. Anything not yet run shows 'not measured'."""
+"""Stores caller-supplied results with a timestamp and machine label. This module does
+not validate provenance; missing entries are displayed as 'not measured'."""
 import json
 import platform
 import time

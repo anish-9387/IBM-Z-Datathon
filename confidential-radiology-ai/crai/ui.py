@@ -1,6 +1,6 @@
-"""Notebook demo UI (ipywidgets). The UI is the 'hospital workstation': it can show the image
-the clinician selected BEFORE encryption, then only ever shows ciphertext, statuses, and the
-verified, signed result that comes back from the guest."""
+"""Notebook demo UI (ipywidgets). The workstation loads and previews plaintext input.
+It also displays ciphertext previews, process statuses and verified guest responses.
+All processes run on the same host; this UI does not demonstrate host isolation."""
 import html
 import io
 import json
@@ -63,22 +63,23 @@ def result_html(res: dict, ct_preview: str):
         why = res.get("refusal") or ("rate limited" if res["stages"].get("rate_limit") == "refused"
                                      else "output/verification failed")
         return (f"<div style='border:2px solid #b3261e;background:#fde8e7;border-radius:8px;padding:12px;"
-                f"color:#1b1d21;font:13px system-ui'><b>Refused - no key, no score.</b><br>Reason: "
-                f"<code>{html.escape(str(why))}</code>. The study stayed ciphertext; nothing but this "
-                f"refusal code left the guest.</div>")
+                f"color:#1b1d21;font:13px system-ui'><b>Request not accepted - no verified score.</b><br>Reason: "
+                f"<code>{html.escape(str(why))}</code>. Check the failed stage; a later-stage "
+                f"failure does not imply that key release or decryption was prevented.</div>")
     p = res["result"]["payload"]
     checks = "".join(f"<li>{'✓' if v else '✗'} {html.escape(k)}</li>" for k, v in res["checks"].items())
     t = res.get("guest_timing") or {}
     timing = ", ".join(f"{k[:-3]} {v:.0f} ms" for k, v in t.items())
     return (f"<div style='border:2px solid #1e7d32;background:#e7f5ea;border-radius:8px;padding:12px;"
             f"color:#1b1d21;font:13px system-ui'>"
-            f"<div style='font:600 22px system-ui'>Pneumonia probability: {p['pneumonia_probability']}</div>"
+            f"<div style='font:600 22px system-ui'>Pneumonia probability: {p['pneumonia_probability']:.4f}</div>"
             f"<div style='color:#444;margin:4px 0'>Research prototype - not a diagnosis. Model output only.</div>"
             f"<div>model_hash <code>{p['model_hash'][:16]}…</code> · study_hash "
             f"<code>{p['study_hash'][:16]}…</code></div>"
             f"<div style='margin-top:6px'><b>Verification</b><ul style='margin:2px 0 0 18px'>{checks}</ul></div>"
-            f"<div style='color:#444'>Host saw only ciphertext: <code>{ct_preview}…</code></div>"
-            f"<div style='color:#444'>End-to-end {res['wall_ms']:.0f} ms (guest: {html.escape(timing)})</div>"
+            f"<div style='color:#444'>Stored ciphertext preview: <code>{ct_preview}…</code>. "
+            f"Plaintext is visible at ingestion; host isolation is not demonstrated.</div>"
+            f"<div style='color:#444'>Guest request {res['wall_ms']:.0f} ms (guest: {html.escape(timing)})</div>"
             f"</div>")
 
 
@@ -88,7 +89,8 @@ def audit_html(n=8):
     rows = "".join(f"<tr><td>{r['actor']}</td><td>{r['event']}</td><td>{r.get('study_id', '')}</td>"
                    f"<td>{html.escape(json.dumps(r.get('detail', {}))[:70])}</td></tr>" for r in recs)
     head = (f"<div style='font:12px system-ui'>Hash chain: <b>{'intact' if ok else f'BROKEN at line {bad}'}</b>"
-            f" · {len(pipeline.audit.records())} events · no pixels, keys or patient ids are logged</div>")
+            f" · {len(pipeline.audit.records())} events · detail fields are allow-listed; "
+            f"callers must keep their values free of sensitive data</div>")
     return head + ("<table style='font:11px monospace;border-collapse:collapse'><tr><th align=left>actor</th>"
                    "<th align=left>event</th><th align=left>study</th><th align=left>detail</th></tr>"
                    + rows + "</table>")
@@ -103,7 +105,7 @@ def explanation_html(ex: dict) -> str:
             f"<div style='margin:4px 0'>{html.escape(ex['canonical'])}</div>"
             f"<div style='margin-top:6px;color:#333'><b>Plain-language version</b> "
             f"<span style='font-size:11px;color:#666'>(AI-generated wording by {html.escape(ex.get('model') or 'Granite')}"
-            f"{timing}; runs outside the guest and sees only the decision code, never the image)</span><br>"
+            f"{timing}; receives security-event fields outside the guest, not the image)</span><br>"
             f"{html.escape(g) if g else '<i>withheld by the faithfulness check: ' + html.escape(ex.get('guard') or 'not available') + '. Use the explanation above.</i>'}</div></div>")
 
 
@@ -152,7 +154,7 @@ def build(client_id="hospital-A"):
     from IPython.display import display
 
     samples = sorted(p for p in config.SAMPLES.glob("*") if p.suffix.lower() in {".png", ".jpg", ".jpeg", ".npy", ".dcm"})
-    pick = W.Dropdown(options=[("— choose a local sample —", None)] + [(p.name, str(p)) for p in samples],
+    pick = W.Dropdown(options=[("- choose a local sample -", None)] + [(p.name, str(p)) for p in samples],
                       description="Sample:", layout=W.Layout(width="420px"))
     up = W.FileUpload(accept=".png,.jpg,.jpeg,.dcm,.npy", multiple=False, description="or upload")
     scen = W.Dropdown(options=SCENARIOS, value="normal", description="Scenario:", layout=W.Layout(width="420px"))

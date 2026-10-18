@@ -83,7 +83,7 @@ def decrypt_into(blob: bytes, dek: bytes, study_id: str, expected_len: int) -> b
         c.decrypt(body, output=buf)
         c.verify(tag)                     # raises ValueError on a bad tag
     except ValueError as e:
-        wipe(buf)                         # unauthenticated plaintext never survives
+        wipe(buf)                         # overwrite this explicit buffer on authentication failure
         raise CiphertextError("authentication failed (invalid AES-GCM tag)") from e
     return buf
 

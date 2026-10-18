@@ -1,6 +1,0 @@
-{
- "model_file": "/home/ibm-user/confidential-radiology-ai/crai_data/models/crai_resnet50_zeroshot.pt",
- "model_hash": "c64992e846e948b6c21aea2c50005a810f9cb902a428f099a29da0f409add332",
- "guest_image_hash": "753e4b2ac4e2965c668f83bf58713999ed7baeea71c1a9444ab078d509fe97ab",
- "approved_at": 1792221329
-}

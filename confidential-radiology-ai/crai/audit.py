@@ -1,8 +1,9 @@
-"""Hash-chained, append-only audit log + token-bucket rate limiter.
+"""Hash-chained audit file + in-memory token-bucket rate limiter.
 
 Each line: {"ts","actor","event","study_id"?,"detail"?,"prev","h"} where h = sha256(line
-without h) and prev = previous line's h. Editing or deleting a line breaks the chain.
-Never log pixels, keys, tokens or patient identifiers: `detail` is filtered to an allow-list.
+without h) and prev = previous line's h. Detects inconsistent edits, but not a complete
+chain rewrite or removal of the tail without an externally trusted checkpoint.
+Detail keys are allow-listed; callers must keep their values free of sensitive data.
 """
 import fcntl
 import hashlib

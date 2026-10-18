@@ -1,8 +1,9 @@
-"""The guest: the ONLY code that ever sees pixels.  python -m crai.guest <study_id> <model_path>
+"""Inference subprocess.  python -m crai.guest <study_id> <model_path>
 
 One short-lived process per study: block egress -> measure itself + model -> attest ->
 request study key -> decrypt into own buffer -> infer -> wipe -> print ONE guarded line.
-stdout carries only the guarded envelope/refusal; stderr carries timing numbers only.
+stdout carries the guarded envelope/refusal; stderr carries timings and error classes.
+Ingestion and clear-path evaluation also see pixels; this process is not hardware-isolated.
 """
 import json
 import sys
@@ -62,7 +63,7 @@ def run(study_id: str, model_path: str):
         prob = model.predict_u8(net, u8)                    # zeroes its own input tensor
         del u8
     finally:
-        crypto.wipe(buf)                                    # pixels gone before anything leaves
+        crypto.wipe(buf)                                    # overwrite this buffer; other copies may remain
     t["infer"] = time.perf_counter()
     out = guard.sign_envelope(guard.build_payload(crypto.sha256_hex(blob), model_hash, prob), sk, token)
     t["sign"] = time.perf_counter()

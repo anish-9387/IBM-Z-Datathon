@@ -20,7 +20,7 @@ from pathlib import Path
 CANONICAL = {
     "verified": ("The result passed every check: the attestation token is genuine, the answer was signed by the key "
                  "that token approved, the model is the approved one, and the result belongs to the study that was sent.",
-                 "The score can be shown to the radiologist as a second opinion."),
+                 "The score is a research model output, not a diagnosis or clinical recommendation."),
     "model_hash_mismatch": ("The guest tried to run a model file whose fingerprint differs from the approved model.",
                             "No study key was released, so the image was never decrypted. Check who changed the model file."),
     "guest_image_hash_mismatch": ("The guest's own code differs from the approved code.",

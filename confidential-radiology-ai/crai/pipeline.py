@@ -1,5 +1,6 @@
-"""Host / PACS side orchestration. The host never decrypts: it encrypts at ingest (hospital
-side), stores ciphertext, launches the guest, and verifies what comes back.
+"""Host / PACS side orchestration: reads plaintext at ingestion, encrypts it, stores
+ciphertext, launches the guest and verifies the response. Clear-path evaluation also
+runs here. Process separation does not protect against a host administrator.
 """
 import json
 import os

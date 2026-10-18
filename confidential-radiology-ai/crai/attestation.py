@@ -1,8 +1,8 @@
 """Attestation evidence (guest side) and attestation tokens (attestation-service side).
 
-SIMULATION: here the guest measures its own code and model. On IBM Secure Execution the
-measurement comes from the Ultravisor/firmware and is signed by an IBM-rooted key (pvattest),
-so a malicious host could not forge it. In this prototype a host-level attacker could.
+SIMULATION: here the guest reports its own code and model hashes. A host-level attacker
+can forge that evidence. Hardware-backed evidence collection and verification are not
+implemented; these tokens do not establish IBM Secure Execution isolation.
 """
 import base64
 import hashlib

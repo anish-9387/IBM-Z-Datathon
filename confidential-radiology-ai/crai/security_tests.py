@@ -1,6 +1,6 @@
-"""Security demonstrations. Each test sets up one attack, runs the real code path, and
-reports PASS only if the system refused in the expected way. Nothing here is mocked except
-the attacker's action itself; tests restore state afterwards."""
+"""Security demonstrations using both pipeline requests and isolated component checks.
+PASS means the specific expected check held under simulated attestation. These tests do
+not prove host isolation. They create runtime studies/logs, including tampered ciphertext."""
 import json
 import os
 import shutil

@@ -1,20 +1,21 @@
-"""Output guard: the ONLY thing that leaves the guest is a fixed, signed JSON envelope.
+"""Output guard for the guest's JSON stdout protocol (result or refusal).
 
 envelope = {"payload": {...}, "signature": <128 hex>, "attestation_token": <token>}
 payload  = {"schema": "crai.result.v1", "study_hash": <64 hex>, "model_hash": <64 hex>,
-            "pneumonia_probability": "0.1234", "issued_at": <int unix s>}
+            "pneumonia_probability": 0.1234, "time": <int unix s>}
 
-Probability is a fixed-width 6-char string, so every response has the same length whatever
-the score (no length side channel). Any extra, missing, or mistyped field is rejected.
+Probability is a JSON number rounded to four decimal places. Extra, missing, or
+mistyped fields are rejected. This protocol guard is not an OS sandbox.
 """
 import json
+import math
 import re
 import time
 
 from . import attestation, crypto
 
 SCHEMA = "crai.result.v1"
-PAYLOAD_KEYS = {"schema", "study_hash", "model_hash", "pneumonia_probability", "issued_at"}
+PAYLOAD_KEYS = {"schema", "study_hash", "model_hash", "pneumonia_probability", "time"}
 ENVELOPE_KEYS = {"payload", "signature", "attestation_token"}
 REFUSAL_KEYS = {"schema", "reason"}
 REFUSAL_REASONS = {"model_hash_mismatch", "guest_image_hash_mismatch", "token_expired", "token_invalid",
@@ -23,7 +24,6 @@ REFUSAL_REASONS = {"model_hash_mismatch", "guest_image_hash_mismatch", "token_ex
 MAX_BYTES = 2048
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 HEX128 = re.compile(r"^[0-9a-f]{128}$")
-PROB = re.compile(r"^[01]\.[0-9]{4}$")
 TOKEN = re.compile(r"^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$")
 
 
@@ -36,9 +36,12 @@ def canon(obj) -> bytes:
 
 
 def build_payload(study_hash: str, model_hash: str, prob: float, now=None) -> dict:
-    p = min(max(float(prob), 0.0), 1.0)
+    p = float(prob)
+    if not math.isfinite(p):
+        raise SchemaError("bad pneumonia_probability")
+    p = min(max(p, 0.0), 1.0)
     payload = {"schema": SCHEMA, "study_hash": study_hash, "model_hash": model_hash,
-               "pneumonia_probability": f"{p:.4f}", "issued_at": int(time.time() if now is None else now)}
+               "pneumonia_probability": round(p, 4), "time": int(time.time() if now is None else now)}
     validate_payload(payload)
     return payload
 
@@ -69,10 +72,10 @@ def validate_payload(p) -> dict:
     if not (isinstance(p["model_hash"], str) and HEX64.match(p["model_hash"])):
         raise SchemaError("bad model_hash")
     pr = p["pneumonia_probability"]
-    if not (isinstance(pr, str) and PROB.match(pr) and float(pr) <= 1.0):
+    if not (type(pr) in (int, float) and 0.0 <= pr <= 1.0):
         raise SchemaError("bad pneumonia_probability")
-    if not (type(p["issued_at"]) is int and p["issued_at"] > 0):
-        raise SchemaError("bad issued_at")
+    if not (type(p["time"]) is int and p["time"] > 0):
+        raise SchemaError("bad time")
     return p
 
 
@@ -117,7 +120,7 @@ def verify_envelope(env: dict, as_pub_hex: str, approved_model_hash: str,
         claims = attestation.verify_token(env["attestation_token"], as_pub_hex, check_exp=False)
         checks["token_signature"] = True
         # result must be produced after attestation, within the guest's max run time
-        checks["issued_after_attestation"] = claims["iat"] - 5 <= p["issued_at"] <= claims["iat"] + 600
+        checks["issued_after_attestation"] = claims["iat"] - 5 <= p["time"] <= claims["iat"] + 600
         checks["model_hash_approved"] = (p["model_hash"] == claims["model_hash"] == approved_model_hash)
         checks["study_hash_matches"] = (p["study_hash"] == expected_study_hash)
         crypto.verify_signature(claims["ed25519_pub"], bytes.fromhex(env["signature"]), canon(p))

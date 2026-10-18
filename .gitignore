@@ -36,13 +36,20 @@ confidential-radiology-ai/crai_data/models/*.npz
 *.log
 .DS_Store
 Thumbs.db
-confidential-radiology-ai/crai_data/models/crai_resnet50_zeroshot.onnx
-confidential-radiology-ai/crai_data/models/crai_resnet50_zeroshot.pt
-confidential-radiology-ai/crai_data/models/telum_weights.npz
-confidential-radiology-ai/crai_data/models/xrv_resnet50_res512_all_state.pt
-sample_data/
-granite-4.0-h-350m-base-be.f16.gguf
-.cache/
-transactions.csv
-transactions_history.csv
-clients.csv
+# Runtime state includes encryption keys, study data and local policy
+crai_data/
+.kaggle/
+kaggle.json
+
+# Imported server home configuration and local cleanup backup
+/.submission-local-backup/
+/.bashrc
+/.bash_profile
+/.bash_logout
+/.bashrc.d/
+/.gitconfig
+/.ipython/
+/.jupyter/
+/.keras/
+/.local/
+._*

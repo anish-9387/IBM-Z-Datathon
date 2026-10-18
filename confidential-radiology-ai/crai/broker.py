@@ -1,10 +1,10 @@
 """Attestation service + key broker, run as a SEPARATE process:  python -m crai.broker
 
-It alone holds the KEK (wraps every study key) and the attestation-service signing key.
-Stands in for: a Trustee attestation service + key broker service, with the KEK in a
-Crypto Express HSM. Here the keys are files in broker_store/ (chmod 600) - SIMULATED HSM.
+It loads the KEK and attestation-service signing key from broker_store/ (chmod 600).
+These files remain accessible to the same OS user and privileged host processes.
+There is no HSM or Trustee integration in this prototype.
 
-Endpoints (localhost only):
+Endpoints (plain HTTP; loopback bind by default, configurable):
   GET  /health            -> {"ok": true, "mode": ...}
   GET  /nonce             -> {"nonce"}                      one-time, expires in NONCE_TTL_S
   GET  /as_pubkey         -> {"ed25519_pub"}                for PACS-side verification

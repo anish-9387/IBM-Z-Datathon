@@ -1,0 +1,14 @@
+# Core notebook environment; use an architecture-compatible PyTorch build on s390x.
+# Original observed versions are recorded in ../docs/evidence/results.json.
+torch
+numpy
+pandas
+Pillow
+pycryptodome
+pydicom
+ipywidgets
+ipython
+jupyterlab
+scikit-learn
+onnx
+kaggle
