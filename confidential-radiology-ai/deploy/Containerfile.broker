@@ -1,0 +1,11 @@
+# Attestation service + key broker. NOT RUN on our LinuxONE Community Cloud server
+# (no podman/docker there); written so the prototype can be deployed as containers.
+# Base image is multi-arch (includes s390x).
+FROM registry.access.redhat.com/ubi9/python-312
+WORKDIR /app
+RUN pip install --no-cache-dir pycryptodome
+COPY crai/ /app/crai/
+ENV CRAI_HOME=/data CRAI_BROKER_BIND=0.0.0.0 CRAI_BROKER_PORT=8701 PYTHONUNBUFFERED=1
+USER 1001
+EXPOSE 8701
+CMD ["python", "-m", "crai.broker", "8701"]

@@ -1,0 +1,13 @@
+{
+  "base_url": "/",
+  "hostname": "0.0.0.0",
+  "password": false,
+  "pid": 7,
+  "port": 38888,
+  "root_dir": "/home/ibm-user",
+  "secure": false,
+  "sock": "",
+  "token": "Your_Token1",
+  "url": "http://linux1:38888/",
+  "version": "2.21.1"
+}

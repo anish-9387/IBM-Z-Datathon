@@ -1,0 +1,142 @@
+{
+ "environment": {
+  "value": {
+   "machine": "s390x",
+   "python": "3.12.15",
+   "cpus": 3,
+   "z_machine_type": "machine = 9175",
+   "nnpa_facility": true,
+   "secure_execution_guest": "no (/sys/firmware/uv absent)",
+   "crypto_express": false,
+   "mem": "MemTotal:        7684076 kB",
+   "zdlc_or_onnx_mlir": false,
+   "torch": "2.11.0+cpu",
+   "numpy": "2.0.2",
+   "Crypto": "4.0.0",
+   "pydicom": "3.0.2",
+   "ipywidgets": "8.1.9",
+   "onnx": "1.22.0",
+   "onnxruntime": "MISSING",
+   "sklearn": "1.9.0",
+   "PIL": "12.3.0",
+   "pandas": "3.0.6"
+  },
+  "measured_at": "2026-10-17 07:15:28",
+  "machine": "s390x"
+ },
+ "security_tests": {
+  "value": {
+   "1": "PASS",
+   "2": "PASS",
+   "3": "PASS",
+   "4": "PASS",
+   "5": "PASS",
+   "6": "PASS",
+   "7": "PASS",
+   "E1": "PASS",
+   "E2": "PASS",
+   "E3": "PASS",
+   "E4": "PASS"
+  },
+  "measured_at": "2026-10-17 07:16:04",
+  "machine": "s390x"
+ },
+ "secure_vs_clear": {
+  "value": {
+   "studies": 1,
+   "verified": 1,
+   "mean_abs_diff": 1.551981940865494e-05,
+   "max_abs_diff": 1.551981940865494e-05,
+   "tolerance": 0.0001,
+   "within_tolerance": true,
+   "studies_source": "public-sample (not RSNA)",
+   "model": "crai_resnet50_zeroshot.pt"
+  },
+  "measured_at": "2026-10-17 07:16:08",
+  "machine": "s390x"
+ },
+ "latency_clear": {
+  "value": {
+   "runs": 5,
+   "median_ms": 1001.5482610033359,
+   "min_ms": 991.2005459991633,
+   "max_ms": 1003.2023739986471,
+   "torch_threads": 3,
+   "machine": "s390x"
+  },
+  "measured_at": "2026-10-17 07:16:14",
+  "machine": "s390x",
+  "note": "PyTorch CPU, batch 1, 512x512"
+ },
+ "latency_secure": {
+  "value": {
+   "n": 1,
+   "median_wall_ms": 2414.4,
+   "guest_breakdown_ms_last": {
+    "wall_ms": 2414.4,
+    "measure_ms": 53.7,
+    "attest_release_ms": 16.4,
+    "model_load_ms": 262.1,
+    "decrypt_ms": 4.1,
+    "infer_ms": 994.8,
+    "sign_ms": 0.9
+   }
+  },
+  "measured_at": "2026-10-17 07:16:14",
+  "machine": "s390x",
+  "note": "includes process start, model load, attestation, decrypt, inference, signing"
+ },
+ "onnx_operators": {
+  "value": {
+   "Conv": 53,
+   "Relu": 49,
+   "Add": 16,
+   "MaxPool": 1,
+   "GlobalAveragePool": 1,
+   "Flatten": 1,
+   "Gemm": 1,
+   "Div": 1,
+   "Sigmoid": 1,
+   "Constant": 1,
+   "Squeeze": 1
+  },
+  "measured_at": "2026-10-17 07:16:16",
+  "machine": "s390x"
+ },
+ "telum_operator_placement": {
+  "value": "not measured",
+  "measured_at": "2026-10-17 07:16:16",
+  "machine": "s390x",
+  "note": "per-operator placement not enumerated (no zDLC/onnx-mlir here); whole-model NNPA speed-up is measured in section 6b"
+ },
+ "granite_explainer": {
+  "value": {
+   "model": "IBM Granite 4.0 350M base (granite-4.0-h-350m-base-be.f16.gguf, llama.cpp)",
+   "load_ms": 2578,
+   "median_generation_ms": 5115.5,
+   "events_explained": 3,
+   "withheld_by_faithfulness_check": 1
+  },
+  "measured_at": "2026-10-17 07:15:54",
+  "machine": "s390x",
+  "note": "host side, outside the guest; input = decision code + stage only; wording only, not authoritative"
+ },
+ "telum_benchmark": {
+  "value": {
+   "model": "crai_resnet50_zeroshot.pt",
+   "images": 1,
+   "images_source": "public-sample (not RSNA)",
+   "batch1_tf_cpu_ms": 318.1,
+   "batch1_tf_nnpa_ms": 95.3,
+   "batch1_speedup": 3.34,
+   "batch8_tf_cpu_ms": 2541.9,
+   "batch8_tf_nnpa_ms": 1011.1,
+   "batch8_speedup": 2.51,
+   "max_abs_diff_tf_nnpa_vs_pytorch": 0.00037549296393990517,
+   "max_abs_diff_tf_cpu_vs_pytorch": 3.259629011154175e-09
+  },
+  "measured_at": "2026-10-17 07:17:02",
+  "machine": "s390x",
+  "note": "TF + ibm-zdnn-plugin vs same TF with plugin hidden; same weights; median of 7 runs"
+ }
+}

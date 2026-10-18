@@ -1,0 +1,48 @@
+# Credentials and local configuration
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+.ssh/
+.aws/
+
+# Caches and downloaded toolchains
+.cache/
+.rustup/
+.cargo/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local environments and dependencies
+.venv/
+venv/
+env/
+node_modules/
+
+# Downloaded or generated model weights
+*.gguf
+*.onnx
+*.pt
+*.pth
+*.safetensors
+confidential-radiology-ai/crai_data/models/*.npz
+
+# Logs and operating system files
+*.log
+.DS_Store
+Thumbs.db
+confidential-radiology-ai/crai_data/models/crai_resnet50_zeroshot.onnx
+confidential-radiology-ai/crai_data/models/crai_resnet50_zeroshot.pt
+confidential-radiology-ai/crai_data/models/telum_weights.npz
+confidential-radiology-ai/crai_data/models/xrv_resnet50_res512_all_state.pt
+sample_data/
+granite-4.0-h-350m-base-be.f16.gguf
+.cache/
+transactions.csv
+transactions_history.csv
+clients.csv

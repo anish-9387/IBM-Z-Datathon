@@ -1,0 +1,12 @@
+# The guest: one short-lived container per study (attest -> decrypt -> infer -> wipe -> sign).
+# NOT RUN on our server. On IBM Z production this would instead be an IBM Secure Execution
+# guest image built with genprotimg; a container alone does NOT exclude the host.
+FROM registry.access.redhat.com/ubi9/python-312
+WORKDIR /app
+# PyTorch CPU wheels for s390x come from PyTorch's CPU index; check availability for your version.
+RUN pip install --no-cache-dir numpy pillow pycryptodome && \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+COPY crai/ /app/crai/
+ENV CRAI_HOME=/data CRAI_BROKER_HOST=crai-broker CRAI_BROKER_PORT=8701 TORCHDYNAMO_DISABLE=1
+USER 1001
+ENTRYPOINT ["python", "-m", "crai.guest"]
