@@ -10,7 +10,7 @@ process, and IBM Granite explanations of security decisions.
 
 [Abstract](docs/Revolution_Abstract.pdf) ·
 [Research deck](docs/Revolution_IBM_Z_Research_Deck.pptx) ·
-[Demo video](confidential-radiology-ai/Revolution_IBM_Z_Video.mp4) ·
+[Demo video](docs/Revolution_IBM_Z_Video.mp4) ·
 [Notebook](confidential-radiology-ai/project.ipynb)
 
 ## The problem
